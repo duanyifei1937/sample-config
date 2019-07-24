@@ -1,0 +1,234 @@
+groups:
+- name: rules/relay.rule
+  rules:
+  - alert: ai_service
+    expr: ai_service < 1
+    for: 2m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ai_text_safety_api
+    expr: ai_text_safety_api < 1
+    for: 3m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI鉴黄/暴恐/政治任务识别 {{$labels.api}} 接口异常,please check
+  - alert: ai_api_sdk
+    expr: api_sdk < 1
+    for: 1m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: duanyifei_test
+    expr: duanyifei_test < 1
+    for: 1m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ClassifyImage_porn
+    expr: ClassifyImage_porn < 1 and time() - lastpush_ClassifyImage_porn < 120
+    for: 1m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ClassifyImage_terrorism
+    expr: ClassifyImage_terrorism < 1 and time() - lastpush_ClassifyImage_terrorism < 120
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ClassifyImage_politic
+    expr: ClassifyImage_politic < 1 and time() - lastpush_ClassifyImage_politic < 120
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ClassifyImage_game
+    expr: ClassifyImage_game < 1 and time() - lastpush_ClassifyImage_game < 120
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ClassifyImage_ocr
+    expr: ClassifyImage_ocr < 1 and time() - lastpush_ClassifyImage_ocr < 120
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,please check
+  - alert: ai_kvision_live_api
+    expr: ai_kvision_live_api < 1
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,http://kvision-live.qyvideo.net/api/notice 接口访问失败,please check
+  - alert: ai_dw_total
+    expr: ai_dw_total < 1
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,DW-ES分钟内流水数<6K,please check
+#  - alert: ai_400_error
+#    expr: ai_400_error < 1
+#    for: 1m
+#    labels:
+#      severity: 2
+#    annotations:
+#      summary: AI {{$labels.service}} 服务异常,AI-selfbuild-elk-es6 1min内400数量大于50,please check
+#  - alert: ai_500_error
+#    expr: ai_500_error < 1
+#    for: 10m
+#    labels:
+#      severity: 2
+#    annotations:
+#      summary: AI {{$labels.service}} 服务异常,AI-selfbuild-elk-es6 1min内500数量大于50,please check
+  - alert: ai_kvision_classifier_image
+    expr: ai_kvision_classifier_image < 1
+    for: 10m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,'http://kvision.qyvideo.net/classifier/image'接口异常,please check
+  - alert: ai_classifier_image_response_time
+    expr: ai_classifier_image_response_time < 1
+    for: 5m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,'classifier/image业务响应时间超2s',please check
+  - alert: ai_huya_response_time
+    expr: ai_huya_response_time < 1 and time() - lastpush_ClassifyPoliticImage < 120
+    for: 1m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,'huya-api业务响应时间超800ms',please check
+  - alert: ai_model_unavailabel
+    expr: ai_model_unavailabel < 1
+    for: 1m
+    labels:
+      severity: 0
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,'model service 不可用',please check
+  - alert: ai_console_api_59_80
+    expr: ai_console_api_59_80 < 1
+    for: 5m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} 服务异常,ai_console_count数为0,please check
+  - alert: ai_console_api_59_80
+    expr: ai_console_api_59_80 < 1
+    for: 5m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} 服务异常, ai_console_count数为0,please check
+  - alert: ai_online_bandwidth_use
+    expr: ai_online_bandwidth_use < 1
+    for: 10m
+    annotations:
+      summary: AI {{$labels.service}} online 公网入带宽使用量超90%,please check
+  - alert: ai_download_bandwidth_use
+    expr: ai_download_bandwidth_use < 1
+    for: 1m
+    annotations:
+      summary: AI {{$labels.service}} download,下载vpc,公网入带宽使用量超90%,please check
+  - alert: ai_online_bandwidth_use
+    expr: ai_online_bandwidth_use < 1
+    for: 10m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} online 公网入带宽使用量超80%,please check
+  - alert: ai_huashu_spider_403
+    expr: ai_huashu_spider_403 < 1
+    for: 1m
+    labels:
+      no_deal: 1
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} 豆瓣spider,公网IP被封,please check
+  - alert: ai_huashu_video_scrapy_error
+    expr: ai_huashu_video_scrapy_error < 1
+    for: 1m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} error数分钟内>1 ,please check
+  - alert: ai_kvision_live_api
+    expr: ai_kvision_live_api < 1
+    for: 1m
+    labels:
+      severity: 1
+    annotations:
+      summary: AI {{$labels.service}} kvision-live接口探测不通,please check
+  - alert: ai_mark_image_cost
+    expr: ai_mark_image_cost < 1
+    for: 1m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} mark image cost 分钟内95值 > 3s,please check
+  - alert: ai_mark_image_error
+    expr: ai_mark_image_error < 1
+    for: 1m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} mark image error > 10,please check
+  - alert: kmark_image_consum_time
+    expr: kmark_image_consum_time < 1
+    for: 1m
+    labels:
+      severity: 2
+    annotations:
+      summary: AI {{$labels.service}} mark image 耗时>3s数量>10,please check
+# # gpu_monitor:
+#   - alert: ai_gpu_status_code
+#     expr: ai_gpu_status_code < 1
+#     for: 1m
+#     labels:
+#       severity: 2
+#     annotations:
+#       summary: AI {{$labels.service}} TITAN V card error,please check
+#   - alert: ai_gpu_used_memory_precent
+#     expr: ai_gpu_used_memory_precent > 0.99
+#     for: 1m
+#     annotations:
+#       summary: 'ENV: {{ $labels.env }}  service: {{ $labels.service }}  IP: {{ $labels.instance }}  info: gpu 显存占用过高 current_value: {{ $value }}'
+#   - alert: ai_gpu_util
+#     expr: ai_gpu_util > 99
+#     for: 2m
+#     annotations:
+#       summary: 'ENV: {{ $labels.env }}  service: {{ $labels.service }}  IP: {{ $labels.instance }}  info: gpu使用率过高  current_value: {{ $value }}'
+#   - alert: ai_gpu_temp
+#     expr: ai_gpu_util > 99
+#     for: 2m
+#     annotations:
+#       summary: 'ENV: {{ $labels.env }}  service: {{ $labels.service }}  IP: {{ $labels.instance }}  info: gpu温度过高  current_value: {{ $value }}'
+  - alert: ai_text_records_501
+    expr: ai_text_records_501 < 1
+    for: 1m
+    annotations:
+      summary: AI {{$labels.service}} 调用文本过滤服务失败,please check
+  - alert: ai_text_records_502
+    expr: ai_text_records_502 < 1
+    for: 1m
+    annotations:
+      summary: AI {{$labels.service}} 解析文本失败,please check
+  - alert: ai_apollo_status
+    expr: ai_apollo_status < 1
+    for: 10m
+    annotations:
+      summary: AI {{$labels.service}} apollo status interface faild, please check

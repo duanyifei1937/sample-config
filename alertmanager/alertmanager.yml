@@ -1,0 +1,53 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 30s
+  repeat_interval: 1m
+  receiver: op
+
+  routes:
+  - match_re:
+      service: op.*
+    receiver: op
+  - match_re:
+      service: dw.*
+    receiver: dw
+  - match_re:
+      service: kvision.*
+    receiver: kvision
+  - match_re:
+      service: sk.*
+    receiver: sk
+  - match_re:
+      service: test.*
+    receiver: test
+  - match_re:
+      service: .*
+    receiver: op
+
+receivers:
+- name: 'op'
+  webhook_configs:
+  - url: http://aialert.abc.net/op/send/
+- name: 'kvision'
+  webhook_configs:
+  - url: http://aialert.abc.net/kvision/send/
+- name: 'dw'
+  webhook_configs:
+  - url: http://aialert.abc.net/dw/send/
+- name: 'sk'
+  webhook_configs:
+  - url: http://aialert.abc.net/sk/send/
+- name: 'test'
+  webhook_configs:
+  - url: http://aialert.abc.net/duanyifei/send/
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

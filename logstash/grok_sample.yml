@@ -1,0 +1,25 @@
+input {
+    file {
+        path => ['/data/logs/**/*.log']
+        type => 'kvision'
+    }
+}
+filter {
+  grok {
+    # 匹配 /data/logs/ 目录中如下文件名格式的日志文件，并将日志type字段修改为name对应的值
+    # (1) name.log
+    # (2) name.other.log (other可为任意字符,只需把index名放在name上)
+    # (3) dir/name.other.log (允许多级子目录)
+    # match => { "path" => "/data/logs(/[\w\d_-]+)*/%{DATA:type}(\.\d{4}-\d{2}-\d{2})?\.log" }
+    match => { "path" => "/data/logs(/[\w\d_-]+)*/%{DATA:type}\..*log" }
+    overwrite => [ "type" ]
+  }
+}
+output {
+    kafka {
+        topic_id => 'kvision-log'
+        bootstrap_servers => "kmr-001.ksc.com:6667,kmr-core-1-001.ksc.com:6667,kmr-core-1-002.ksc.com:6667"
+        codec => json
+    }
+    #stdout{codec => rubydebug}
+}

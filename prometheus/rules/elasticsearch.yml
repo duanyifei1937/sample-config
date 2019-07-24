@@ -1,0 +1,70 @@
+groups:
+- name: elasticsearch
+
+  rules:
+  - alert: elasticsearch_index_status
+    expr: es_index_status != 0
+    for: 60m
+    labels:
+      severity: 2
+    annotations:
+      summary: "Index: {{ $labels.index }}, Service: {{ $labels.service }}, Instance: {{ $labels.instance }} 集群索引状态出错"
+
+  - alert: elasticsearch_cluster_health_statu_green 
+    expr: elasticsearch_cluster_health_status{color="green"} != 1
+    for: 15m
+    labels:
+      severity: 1
+    annotations:
+      summary: "Cluster: {{ $labels.cluster}}, Service: {{ $labels.service }}, Instance: {{ $labels.instance }} 集群状态非绿色"
+
+  - alert: elasticsearch_node_stats_up 
+    expr: elasticsearch_node_stats_up != 1
+    for: 15m
+    labels:
+      severity: 1
+    annotations:
+      summary: "Service: {{ $labels.service }}, Instance: {{ $labels.instance }}, 节点状态异常"
+
+#  - alert: elasticsearch_fs_utilization_percent
+#    expr: (es_fs_total_free_bytes / es_fs_total_total_bytes ) * 100 < 20 
+#    for: 10m
+#    labels:
+#      severity: 1
+#    annotations:
+#      summary: "aidw 新集群节点磁盘可用空间小于 20%. 节点：{{ $labels.host }}. 挂载点： {{ $labels.mount }}."      
+
+  - alert: elasticsearch_jvm_gc_collection
+    expr: (elasticsearch_jvm_gc_collection_seconds_sum  / elasticsearch_jvm_gc_collection_seconds_count ) > 5
+    for: 3m
+    labels:
+      severity: 2 
+      no_deal: 1
+    annotations:
+      summary: "Service: {{ $labels.service }}, Instance: {{ $labels.instance }} jvm 垃圾回收时间大于 5s, current_value: {{ $value }} s"
+
+#  - alert: index_rate 
+#    expr: sum(rate(elasticsearch_indices_indexing_index_time_seconds_total[10m]))by(cluster,name) > 5 
+#    for: 10m
+#    labels:
+#      severity: 2 
+#      no_deal: 1
+#    annotations:
+#      summary: "Service: {{ $labels.service }}, Instance: {{ $labels.instance }} , Node: {{ $labels.name }} index 10 分钟内平均写入速率大于 5 秒，current_value: {{ $value }} s"
+#
+#  - alert: search_rate 
+#    expr: sum(rate(elasticsearch_indices_indexing_index_time_seconds_total[10m]))by(cluster,name) > 5 
+#    for: 10m
+#    labels:
+#      severity: 2 
+#      no_deal: 1
+#    annotations:
+#      summary: "Service: {{ $labels.service }}, Instance: {{ $labels.instance }} , Node: {{ $labels.name }} index 10 分钟内平均查询速率大于 5 秒，current_value: {{ $value }} s"
+
+  - alert: elasticsearch_cluster_unassigned_shards 
+    expr: (elasticsearch_cluster_health_unassigned_shards /  elasticsearch_cluster_health_active_shards) * 100 > 20 
+    for: 10m
+    labels:
+      severity: 1 
+    annotations:
+      summary: "Cluster: {{ $labels.cluster}}, Service: {{ $labels.service }}, Instance: {{ $labels.instance }} unassigned shards 数量大于 20 %， current_value: {{ $value }}%"

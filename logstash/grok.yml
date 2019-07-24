@@ -1,0 +1,97 @@
+input{
+    kafka {
+        bootstrap_servers => "1.1.1.1:9092,2.2.2.2:9092,3.3.3.3:9092"
+        group_id => "logstash"
+        topics => ["kvision-log"]
+        consumer_threads => 2
+    }
+}
+filter {
+    if [source] =~ "nginx\/access" {
+        mutate {
+            add_field => {
+                "type" => "nginx-log-server"
+            }
+        }
+    } else if [source] =~ "nginx\/error" {
+        mutate {
+            add_field => {
+                "type" => "nginx-log-error"
+            }
+        }
+    } else {
+        grok {
+            match => { "source" => "/data/logs(/[\w\d_-]+)*/%{DATA:type}\..*log" }
+            overwrite => [ "type" ]
+        }
+    }
+    json {
+        source => "message"
+    }
+    if [type] == "nginx-log-error" {
+        date {
+            match => [ "timestamp" , "yyyy/MM/dd HH:mm:ss" ]
+        }
+    } else if [type] == "kvision-live-log" or [type] == "data-worker-log" {
+        grok {
+            match => [ "message" , "%{COMBINEDAPACHELOG} %{QS:x_forwarded_for}",
+            "message" , "(?<timestamp>[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{0,3})"
+            ]
+        }
+        date {
+            match => [ "timestamp" , "YYYY-MM-dd HH:mm:ss.SSS" ]
+        }
+    } else {
+        # json 格式日志
+        if [type] == "nginx-log-server" {
+            json {
+                source => "message"
+                remove_field => "message"
+            }
+            date {
+                match => [ "timestamp", "dd/MMM/yyyy:HH:mm:ss Z" ]
+                target => "@timestamp"
+                timezone => "Etc/GMT-8"
+            }
+            mutate {
+                convert => {
+                    "status" => "integer"
+                    "body_bytes_sent" => "integer"
+                    "request_time" => "float"
+                    "upstream_response_time" => "float"
+                }
+            }
+        } else {
+            json {
+                source => "message"
+                remove_field => "json_message"
+            }
+            json {
+                source => "message"
+            }
+            if [type] == "kvision-gw" {
+                mutate {
+                    update => { "type" => "log" }
+                }
+            }
+            if [source] == "/var/tmp/kvision-logs/suppervisor_kvision-webapi.log" {
+                drop { }
+            }
+            date {
+                match => [ "timestamp", "yyyy-MM-dd HH:mm:ss.SSS" ]
+                target => "@timestamp"
+                timezone => "Etc/GMT-8"
+            }
+        }
+    }
+
+}
+output {
+    elasticsearch {
+        hosts => ["4.4.4.4:9200","5.5.5.5:9200","6.6.6.6:9200"]
+        index => "logstash-%{type}-%{+YYYY.MM.dd}"
+        template_overwrite => true
+        user => "elastic"
+        password => "$ES_PASSWD"
+    }
+}

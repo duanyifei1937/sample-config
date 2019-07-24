@@ -1,0 +1,8 @@
+[{
+    "labels": {
+        "service": "redash"
+    },
+    "targets": [
+        "1.2.3.4:80"
+    ]
+}]
